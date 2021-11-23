@@ -129,12 +129,16 @@ defmodule ExTTY do
   def spawn_muontrap(opts \\ []) do
     exec = Keyword.fetch!(opts, :exec)
     args = Keyword.fetch!(opts, :args)
+    env = Keyword.fetch!(opts, :env)
     gl = Process.group_leader()
 
     spawn(fn ->
       MuonTrap.cmd(exec, args,
         into: IO.stream(gl, :line),
-        stderr_to_stdout: true
+        stderr_to_stdout: true,
+        env: env
+        # cgroup_controllers: ["memory", "cpu"], cgroup_base: "mycgroup",
+        # cgroup_sets: [{"memory", "memory.limit_in_bytes", "256M"}, {"cpu", "cpu.cfs_period_us", "100000"}, {"cpu", "cpu.cfs_quota_us", 5000}]
       )
     end)
   end
